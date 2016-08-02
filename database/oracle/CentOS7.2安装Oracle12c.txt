@@ -1,0 +1,78 @@
+1
+2G
+aliyunECS,2G40G
+2 CentOS 
+[root@iZ25v3zxo9vZ ~]# yum update -y
+3 Oracle  12c  Linux x86-64 
+http://www.oracle.com/technetwork/cn/database/enterprise-edition/downloads/database12c-linux-download-2240591-zhs.html
+Safari
+\home\oracle\product\12.1.0\dbhome_1\ctx\admin\dr0ulib.sql.sbs
+http://blog.csdn.net/ljunjie82/article/details/44727417
+4
+Oracle
+[root@iZ25v3zxo9vZ ~]# groupadd oinstall
+[root@iZ25v3zxo9vZ ~]# groupadd dba
+[root@iZ25v3zxo9vZ ~]# useradd -g oinstall -G dba oracle
+[root@iZ25v3zxo9vZ ~]# passwd oracle
+root
+5
+ /etc/sysctl.conf 
+
+fs.aio-max-nr = 1048576
+fs.file-max = 6815744
+kernel.shmall = 2097152
+kernel.shmmax = 1987162112
+kernel.shmmni = 4096
+kernel.sem = 250 32000 100 128
+net.ipv4.ip_local_port_range = 9000 65500
+net.core.rmem_default = 262144
+net.core.rmem_max = 4194304
+net.core.wmem_default = 262144
+net.core.wmem_max = 1048586
+
+
+[root@iZ25v3zxo9vZ ~]# sysctl -p
+[root@iZ25v3zxo9vZ ~]# sysctl -a
+
+ /etc/security/limits.conf  oracle 
+oracle soft nproc 2047
+oracle hard nproc 16384
+oracle soft nofile 1024
+oracle hard nofile 65536
+6
+ Oracle  zip linuxamd64_12102_database_1of2.zip, linuxamd64_12102_database_2of2.zip /database12c 
+
+[root@iZ25v3zxo9vZ ~]# yum install -y zip unzip
+[root@iZ25v3zxo9vZ ~]# unzip linuxamd64_12102_database_1of2.zip -d /database12c/
+[root@iZ25v3zxo9vZ ~]# unzip linuxamd64_12102_database_2of2.zip -d /database12c/
+
+/stage 
+[root@centos7 ~]# chown -R oracle:oinstall /database12c/
+7 Oracle  /u01  /u02 
+
+[root@iZ25v3zxo9vZ ~]# mkdir /u01
+[root@iZ25v3zxo9vZ ~]# mkdir /u02
+[root@iZ25v3zxo9vZ ~]# chown -R oracle:oinstall /u01
+[root@iZ25v3zxo9vZ ~]# chown -R oracle:oinstall /u02
+[root@iZ25v3zxo9vZ ~]# chmod -R 775 /u01
+[root@iZ25v3zxo9vZ ~]# chmod -R 775 /u02
+[root@iZ25v3zxo9vZ ~]# chmod g+s /u01
+[root@iZ25v3zxo9vZ ~]# chmod g+s /u02
+8
+
+[root@iZ25v3zxo9vZ ~]# yum install -y binutils.x86_64 compat-libcap1.x86_64 gcc.x86_64 gcc-c++.x86_64 glibc.i686 glibc.x86_64 \
+glibc-devel.i686 glibc-devel.x86_64 ksh compat-libstdc++-33 libaio.i686 libaio.x86_64 libaio-devel.i686 libaio-devel.x86_64 \
+libgcc.i686 libgcc.x86_64 libstdc++.i686 libstdc++.x86_64 libstdc++-devel.i686 libstdc++-devel.x86_64 libXi.i686 libXi.x86_64 \
+libXtst.i686 libXtst.x86_64 make.x86_64 sysstat.x86_64
+ X Window System 
+[root@centos7 ~]# yum groupinstall -y "X Window System"
+ Oracle 
+ SSH PuTTY X-Windows Xming Windows 
+
+ Windows  Xming
+https://wiki.centos.org/zh/HowTos/Xming
+
+
+https://wiki.centos.org/zh/HowTos/Oracle12onCentos7#head-a47ebe97eab613adf7acc0a76f29b502074a33cf
+https://wiki.centos.org/zh/HowTos/Xming
+https://github.com/itrunc/notes/commit/4bac956c596acfea0b72f7b258c82aa347a3351b
