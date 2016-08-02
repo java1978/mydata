@@ -117,10 +117,26 @@ Swap Size  警告
 This is a prerequisite condition to test whether sufficient total swap space is available on the system.(more details)
 Expected Value:2.6934GB(2824206.0KB)
 ActualValue:0.0 bytes
+
 此处需要设置Swap大小
 参考文档http://blog.csdn.net/hailang08/article/details/11570305
 在root用户下执行
-dd if=/dev/zero of=/home/oracle/swap bs=1M count=6144
+[root@iZ25v3zxo9vZ ~]# dd if=/dev/zero of=/home/oracle/swap bs=1M count=6144
+[root@iZ25v3zxo9vZ ~]# cd /home/oracle
+[root@iZ25v3zxo9vZ oracle]# ls
+swap
+[root@iZ25v3zxo9vZ oracle]# mv swap swapfile
+[root@iZ25v3zxo9vZ oracle]# ls
+swapfile
+创建swap文件
+[root@iZ25v3zxo9vZ oracle]# mkswap swapfile
+Setting up swapspace version 1, size = 6291452 KiB
+no label, UUID=3d109068-7639-4bd9-8819-daf519999236
+激活swap文件
+[root@iZ25v3zxo9vZ oracle]# swapon swapfile
+swapon: /home/oracle/swapfile: insecure permissions 0644, 0600 suggested.
+
+参考文档：
 https://wiki.centos.org/zh/HowTos/Oracle12onCentos7#head-a47ebe97eab613adf7acc0a76f29b502074a33cf
 https://wiki.centos.org/zh/HowTos/Xming
 https://github.com/itrunc/notes/commit/4bac956c596acfea0b72f7b258c82aa347a3351b
