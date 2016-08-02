@@ -135,7 +135,100 @@ no label, UUID=3d109068-7639-4bd9-8819-daf519999236
 激活swap文件
 [root@iZ25v3zxo9vZ oracle]# swapon swapfile
 swapon: /home/oracle/swapfile: insecure permissions 0644, 0600 suggested.
+12
+root
+[root@iZ25v3zxo9vZ ~]# /u01/app/oraInventory/orainstRoot.sh
+Changing permissions of /u01/app/oraInventory.
+Adding read,write permissions for group.
+Removing read,write,execute permissions for world.
+Changing groupname of /u01/app/oraInventory to oinstall.
+The execution of the script is complete.
 
+[root@iZ25v3zxo9vZ ~]# /u01/app/oracle/product/12.1.0/dbhome_1/root.sh
+Performing root user operation.
+The following environment variables are set as:
+    ORACLE_OWNER= oracle
+    ORACLE_HOME=  /u01/app/oracle/product/12.1.0/dbhome_1
+Enter the full pathname of the local bin directory: [/usr/local/bin]: <PRESS ENTER>
+   Copying dbhome to /usr/local/bin ...
+   Copying oraenv to /usr/local/bin ...
+   Copying coraenv to /usr/local/bin ...
+Creating /etc/oratab file...
+Entries will be added to the /etc/oratab file as needed by
+Database Configuration Assistant when a database is created
+Finished running generic part of root script.
+Now product-specific root actions will be performed.
+You can follow the installation in a separated window.
+ root 
+
+13
+
+13.1
+ root 
+
+
+[root@iZ25v3zxo9vZ ~]# firewall-cmd --get-active-zones
+public
+  interfaces: eth0
+
+
+
+[root@iZ25v3zxo9vZ ~]# firewall-cmd --zone=public --add-port=1521/tcp --add-port=5500/tcp --add-port=5520/tcp --add-port=3938/tcp --permanent
+success
+
+[root@iZ25v3zxo9vZ ~]# firewall-cmd --reload
+success
+
+[root@iZ25v3zxo9vZ ~]# firewall-cmd --list-ports
+1521/tcp 3938/tcp 5500/tcp 5520/tcp
+13.2 Oracle 
+ oracle  /home/oracle/.bash_profile 
+
+
+TMPDIR=$TMP; export TMPDIR
+ORACLE_BASE=/u01/app/oracle; export ORACLE_BASE
+ORACLE_HOME=$ORACLE_BASE/product/12.1.0/dbhome_1; export ORACLE_HOME
+ORACLE_SID=orcl; export ORACLE_SID
+PATH=$ORACLE_HOME/bin:$PATH; export PATH
+LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib:/usr/lib64; export LD_LIBRARY_PATH
+CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib; export CLASSPATH
+ bash_profile 
+
+
+[root@iZ25v3zxo9vZ ~]$ . .bash_profile
+13.3 
+
+[root@iZ25v3zxo9vZ ~]$ sqlplus system@orcl
+... output omitted ...
+Oracle Database 12c Enterprise Edition Release 12.1.0.2.0 - 64bit Production
+With the Partitioning, OLAP, Advanced Analytics and Real Application Testing options
+SQL>
+ Oracle 
+
+https://<>:5500/em
+14、执行远程链接数据报无监听错误
+ORA-12541: TNS:no listener
+查看错误原因发现/u01/app/oracle/product/12.1.0/dbhome_1/network/admin/
+下的listener.ora文件HOST对应值为localhost
+      (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521))
+这个问题应该是我没有执行https://wiki.centos.org/zh/HowTos/Oracle12onCentos7#head-a47ebe97eab613adf7acc0a76f29b502074a33cf文档中提到的
+请确认主机名称并在你的 DNS 上登记它。你也可选择在 /etc/hosts 内加入你的主机名称／IP。
+[root@centos7 ~]# cat /etc/hostname
+centos7.example.com
+修改listener.ora文件中的HOST值为对应的主机名称或ip值
+(ADDRESS = (PROTOCOL = TCP)(HOST = iZ25v3zxo9vZ)(PORT = 1521))
+同时确认listener.ora文件是否将数据库实例注册到listener，内容如下：
+SID_LIST_LISTENER =  
+(SID_LIST =  
+  (SID_DESC =  
+  (GLOBAL_DBNAME = orcl)
+  (SID_NAME = orcl)
+  )
+)
+如果没有将数据库实例注册到listener中，远程链接数据库回报以下错误：
+oracle ORA-12514:TNS:listener does not currently know of service requested in connect descriptor
+在修改listener.ora前，要先登陆oracle用户，执行lsnrctl stop,关闭监听器，然后修改listener.ora。
+修改完成后执行lsnrctl start,启用监听。lsnrctl status查看监听状态。
 参考文档：
 https://wiki.centos.org/zh/HowTos/Oracle12onCentos7#head-a47ebe97eab613adf7acc0a76f29b502074a33cf
 https://wiki.centos.org/zh/HowTos/Xming
