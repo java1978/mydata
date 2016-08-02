@@ -43,11 +43,11 @@ oracle hard nofile 65536
 将 Oracle 数据库软件的 zip 文件（linuxamd64_12102_database_1of2.zip, linuxamd64_12102_database_2of2.zip）解压至 /database12c 目录。
 
 [root@iZ25v3zxo9vZ ~]# yum install -y zip unzip
-[root@iZ25v3zxo9vZ ~]# unzip linuxamd64_12102_database_1of2.zip -d /database12c/
-[root@iZ25v3zxo9vZ ~]# unzip linuxamd64_12102_database_2of2.zip -d /database12c/
+[root@iZ25v3zxo9vZ ~]# unzip linuxamd64_12102_database_1of2.zip -d /
+[root@iZ25v3zxo9vZ ~]# unzip linuxamd64_12102_database_2of2.zip -d /
 
 修改　/stage 的权限
-[root@centos7 ~]# chown -R oracle:oinstall /database12c/
+[root@centos7 ~]# chown -R oracle:oinstall /database/
 7、为 Oracle 软件创建 /u01 目录，及为数据库文件创建 /u02 目录。
 
 [root@iZ25v3zxo9vZ ~]# mkdir /u01
@@ -93,8 +93,34 @@ sysstat
 
 以下文档描述如何在 Windows 系统上安装 Xming。
 https://wiki.centos.org/zh/HowTos/Xming
+1）双击Xming图标，启动Xming，可以通过任务管理器查看到Xming进程
+2)执行PuTTY,在Session输入安装主机的ip地址
+3)在Connection->SSH->X11选中Enable X11 forwarding选项
+root用户下执行
+chown -R oracle:oinstall /tmp
+如果不执行这句，在安装时，系统会报无法访问临时文件夹的错误。
+在PuTTY执行安装命令：
+[oracle@iZ25v3zxo9vZ database]$ ./runInstaller
+Starting Oracle Universal Installer...
 
-参考文档
+Checking Temp space: must be greater than 500 MB.   Actual 31201 MB    Passed
+Checking swap space: 0 MB available, 150 MB required.    Failed <<<<
+Checking monitor: must be configured to display at least 256 colors.    Actual 16777216    Passed
+
+Some requirement checks failed. You must fulfill these requirements before
+
+continuing with the installation,
+
+Continue? (y/n) [n] y
+执行到Prerequisite Checks环节，会提示
+Swap Size  警告
+This is a prerequisite condition to test whether sufficient total swap space is available on the system.(more details)
+Expected Value:2.6934GB(2824206.0KB)
+ActualValue:0.0 bytes
+此处需要设置Swap大小
+参考文档http://blog.csdn.net/hailang08/article/details/11570305
+在root用户下执行
+dd if=/dev/zero of=/home/oracle/swap bs=1M count=6144
 https://wiki.centos.org/zh/HowTos/Oracle12onCentos7#head-a47ebe97eab613adf7acc0a76f29b502074a33cf
 https://wiki.centos.org/zh/HowTos/Xming
 https://github.com/itrunc/notes/commit/4bac956c596acfea0b72f7b258c82aa347a3351b
