@@ -86,6 +86,23 @@ libxcb \
 libXi \
 make \
 sysstat
+9、给oracle:oinstall赋对/tmp目录的使用权限
+在root用户下执行
+chown -R oracle:oinstall /tmp
+此处是我这次安装中碰到的最大的坑，折磨了两个白天都没解决掉。在此一定要感谢浩哥，不是他的协助我绝对发现不了这个问题，当时几乎都要崩溃的放弃安装，linux知识欠缺啊。
+如果不执行这句，在安装时，系统会报无法访问临时文件夹的错误。
+Cause - Failed to access the temporary location.  
+ Action - Ensure that the current user has required permissions to access the temporary location.  
+ Additional Information:
+  - Framework setup check failed on all the nodes  
+  - Cause: Cause Of Problem Not Available  
+  - Action: User Action Not Available 
+ Summary of the failed nodes 
+ iz25v3zxo9vz  
+  - Version of exectask could not be retrieved from node "iz25v3zxo9vz"  
+  - Cause: Cause Of Problem Not Available  
+  - Action: User Action Not Available 
+ 
 安装 X Window System 组件群组。
 [root@centos7 ~]# yum groupinstall -y "X Window System"
 由于 Oracle 的安装采用图像界面
@@ -96,9 +113,7 @@ https://wiki.centos.org/zh/HowTos/Xming
 1）双击Xming图标，启动Xming，可以通过任务管理器查看到Xming进程
 2)执行PuTTY,在Session输入安装主机的ip地址
 3)在Connection->SSH->X11选中Enable X11 forwarding选项
-root用户下执行
-chown -R oracle:oinstall /tmp
-如果不执行这句，在安装时，系统会报无法访问临时文件夹的错误。
+4)链接安装主机
 在PuTTY执行安装命令：
 [oracle@iZ25v3zxo9vZ database]$ ./runInstaller
 Starting Oracle Universal Installer...
@@ -135,8 +150,7 @@ no label, UUID=3d109068-7639-4bd9-8819-daf519999236
 激活swap文件
 [root@iZ25v3zxo9vZ oracle]# swapon swapfile
 swapon: /home/oracle/swapfile: insecure permissions 0644, 0600 suggested.
-12
-root
+12、当询问窗口出现时，请登录成为 root 并执行两个脚本：
 [root@iZ25v3zxo9vZ ~]# /u01/app/oraInventory/orainstRoot.sh
 Changing permissions of /u01/app/oraInventory.
 Adding read,write permissions for group.
@@ -159,32 +173,22 @@ Database Configuration Assistant when a database is created
 Finished running generic part of root script.
 Now product-specific root actions will be performed.
 You can follow the installation in a separated window.
- root 
 
-13
-
-13.1
- root 
-
-
+13. 安装后的任务
+13.1. 防火墙
+请登录成为 root 并检查已引导的本地
 [root@iZ25v3zxo9vZ ~]# firewall-cmd --get-active-zones
 public
   interfaces: eth0
-
-
-
+打开相关的端口
 [root@iZ25v3zxo9vZ ~]# firewall-cmd --zone=public --add-port=1521/tcp --add-port=5500/tcp --add-port=5520/tcp --add-port=3938/tcp --permanent
 success
-
 [root@iZ25v3zxo9vZ ~]# firewall-cmd --reload
 success
-
 [root@iZ25v3zxo9vZ ~]# firewall-cmd --list-ports
 1521/tcp 3938/tcp 5500/tcp 5520/tcp
-13.2 Oracle 
- oracle  /home/oracle/.bash_profile 
-
-
+13.2. Oracle 工作环境
+请登录为 oracle 用户并在 /home/oracle/.bash_profile 内加入下列数值
 TMPDIR=$TMP; export TMPDIR
 ORACLE_BASE=/u01/app/oracle; export ORACLE_BASE
 ORACLE_HOME=$ORACLE_BASE/product/12.1.0/dbhome_1; export ORACLE_HOME
@@ -192,20 +196,18 @@ ORACLE_SID=orcl; export ORACLE_SID
 PATH=$ORACLE_HOME/bin:$PATH; export PATH
 LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib:/usr/lib64; export LD_LIBRARY_PATH
 CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib; export CLASSPATH
- bash_profile 
-
-
+重新装入 bash_profile 来运用新设置值：
 [root@iZ25v3zxo9vZ ~]$ . .bash_profile
-13.3 
-
-[root@iZ25v3zxo9vZ ~]$ sqlplus system@orcl
+
+13.3. 登录数据库
+[oracle@iZ25v3zxo9vZ ~]$ sqlplus system@orcl
 ... output omitted ...
 Oracle Database 12c Enterprise Edition Release 12.1.0.2.0 - 64bit Production
 With the Partitioning, OLAP, Advanced Analytics and Real Application Testing options
 SQL>
- Oracle 
+请利用 Oracle 企业级管理员来管理数据库：
 
-https://<>:5500/em
+https://<主机名称>:5500/em
 14、执行远程链接数据报无监听错误
 ORA-12541: TNS:no listener
 查看错误原因发现/u01/app/oracle/product/12.1.0/dbhome_1/network/admin/
@@ -229,8 +231,78 @@ SID_LIST_LISTENER =
 oracle ORA-12514:TNS:listener does not currently know of service requested in connect descriptor
 在修改listener.ora前，要先登陆oracle用户，执行lsnrctl stop,关闭监听器，然后修改listener.ora。
 修改完成后执行lsnrctl start,启用监听。lsnrctl status查看监听状态。
-参考文档：
+执行内容如下：
+[oracle@iZ25v3zxo9vZ ~]$ lsnrctl stop
+
+LSNRCTL for Linux: Version 12.1.0.2.0 - Production on 02-AUG-2016 17:57:00
+
+Copyright (c) 1991, 2014, Oracle.  All rights reserved.
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=iZ25v3zxo9vZ)(PORT=1521)))
+The command completed successfully
+[oracle@iZ25v3zxo9vZ ~]$ lsnrctl start
+
+LSNRCTL for Linux: Version 12.1.0.2.0 - Production on 02-AUG-2016 17:58:08
+
+Copyright (c) 1991, 2014, Oracle.  All rights reserved.
+
+Starting /u01/app/oracle/product/12.1.0/dbhome_1/bin/tnslsnr: please wait...
+
+TNSLSNR for Linux: Version 12.1.0.2.0 - Production
+System parameter file is /u01/app/oracle/product/12.1.0/dbhome_1/network/admin/listener.ora
+Log messages written to /u01/app/oracle/diag/tnslsnr/iZ25v3zxo9vZ/listener/alert/log.xml
+Listening on: (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=iZ25v3zxo9vZ)(PORT=1521)))
+Listening on: (DESCRIPTION=(ADDRESS=(PROTOCOL=ipc)(KEY=EXTPROC1521)))
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=iZ25v3zxo9vZ)(PORT=1521)))
+STATUS of the LISTENER
+------------------------
+Alias                     LISTENER
+Version                   TNSLSNR for Linux: Version 12.1.0.2.0 - Production
+Start Date                02-AUG-2016 17:58:08
+Uptime                    0 days 0 hr. 0 min. 0 sec
+Trace Level               off
+Security                  ON: Local OS Authentication
+SNMP                      OFF
+Listener Parameter File   /u01/app/oracle/product/12.1.0/dbhome_1/network/admin/listener.ora
+Listener Log File         /u01/app/oracle/diag/tnslsnr/iZ25v3zxo9vZ/listener/alert/log.xml
+Listening Endpoints Summary...
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=iZ25v3zxo9vZ)(PORT=1521)))
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=ipc)(KEY=EXTPROC1521)))
+Services Summary...
+Service "orcl" has 1 instance(s).
+  Instance "orcl", status UNKNOWN, has 1 handler(s) for this service...
+The command completed successfully
+[oracle@iZ25v3zxo9vZ ~]$ lsnrctl status
+
+LSNRCTL for Linux: Version 12.1.0.2.0 - Production on 02-AUG-2016 17:58:13
+
+Copyright (c) 1991, 2014, Oracle.  All rights reserved.
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=iZ25v3zxo9vZ)(PORT=1521)))
+STATUS of the LISTENER
+------------------------
+Alias                     LISTENER
+Version                   TNSLSNR for Linux: Version 12.1.0.2.0 - Production
+Start Date                02-AUG-2016 17:58:08
+Uptime                    0 days 0 hr. 0 min. 5 sec
+Trace Level               off
+Security                  ON: Local OS Authentication
+SNMP                      OFF
+Listener Parameter File   /u01/app/oracle/product/12.1.0/dbhome_1/network/admin/listener.ora
+Listener Log File         /u01/app/oracle/diag/tnslsnr/iZ25v3zxo9vZ/listener/alert/log.xml
+Listening Endpoints Summary...
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=iZ25v3zxo9vZ)(PORT=1521)))
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=ipc)(KEY=EXTPROC1521)))
+Services Summary...
+Service "orcl" has 1 instance(s).
+  Instance "orcl", status UNKNOWN, has 1 handler(s) for this service...
+The command completed successfully
+最后感谢浩哥的帮助！
+主要参考文档：
 https://wiki.centos.org/zh/HowTos/Oracle12onCentos7#head-a47ebe97eab613adf7acc0a76f29b502074a33cf
 https://wiki.centos.org/zh/HowTos/Xming
 https://github.com/itrunc/notes/commit/4bac956c596acfea0b72f7b258c82aa347a3351b
 https://oracle-base.com/articles/12c/oracle-db-12cr1-installation-on-oracle-linux-6
+https://dotblogs.com.tw/jamesfu/2016/02/02/oracle12c_install
+http://www.ha97.com/4785.html
