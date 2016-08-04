@@ -298,6 +298,15 @@ Services Summary...
 Service "orcl" has 1 instance(s).
   Instance "orcl", status UNKNOWN, has 1 handler(s) for this service...
 The command completed successfully
+15、最后在编写程序用jdbc链接oracle12c时，如果用的驱动程序包为旧的程序包，我用的是ojdbc14.jar包，会包一下错误：
+ORA-28040: No matching authentication protocol
+解决办法两个：
+1、从$ORACLE_HOME/jdbc/lib/目录下拷贝新的驱动包，ojdbc6.jar对应jdk版本为jdk6，ojdbc7.jar对应为jdk7、8
+我安装的oracle12c驱动包路径为/u01/app/oracle/product/12.1.0/dbhome_1/jdbc/lib/
+2、编辑 $ORACLE_HOME/network/admin/sqlnet.ora文件，如果没有可以创建一个新的，加入下面的参数
+SQLNET.ALLOWED_LOGON_VERSION=8
+我的安装路径为/u01/app/oracle/product/12.1.0/dbhome_1/network/admin/
+参考文档：http://blog.csdn.net/kongxx/article/details/44887379
 最后感谢浩哥的帮助！
 主要参考文档：
 https://wiki.centos.org/zh/HowTos/Oracle12onCentos7#head-a47ebe97eab613adf7acc0a76f29b502074a33cf
@@ -307,3 +316,4 @@ https://oracle-base.com/articles/12c/oracle-db-12cr1-installation-on-oracle-linu
 https://dotblogs.com.tw/jamesfu/2016/02/02/oracle12c_install
 http://www.ha97.com/4785.html
 http://www.jianshu.com/p/c9c24b3a1c53
+http://blog.csdn.net/kongxx/article/details/44887379
