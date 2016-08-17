@@ -1,0 +1,80 @@
+错误日志：
+Caused by: java.lang.UnsupportedClassVersionError: javax/annotation/ManagedBean : Unsupported major.minor version 51.0
+        at java.lang.ClassLoader.defineClass1(Native Method)
+        at java.lang.ClassLoader.defineClass(ClassLoader.java:620)
+        at java.security.SecureClassLoader.defineClass(SecureClassLoader.java:124)
+        at java.net.URLClassLoader.defineClass(URLClassLoader.java:260)
+        at java.net.URLClassLoader.access$000(URLClassLoader.java:56)
+        at java.net.URLClassLoader$1.run(URLClassLoader.java:195)
+        at java.security.AccessController.doPrivileged(Native Method)
+        at java.net.URLClassLoader.findClass(URLClassLoader.java:188)
+        at org.springframework.boot.loader.LaunchedURLClassLoader.doLoadClass(LaunchedURLClassLoader.java:170)
+        at org.springframework.boot.loader.LaunchedURLClassLoader.loadClass(LaunchedURLClassLoader.java:142)
+        at java.lang.ClassLoader.loadClass(ClassLoader.java:251)
+        at org.springframework.util.ClassUtils.forName(ClassUtils.java:250)
+        at org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider.registerDefaultFilters(ClassPathScanningCandidateComponentProvider.java:243)
+        at org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider.<init>(ClassPathScanningCandidateComponentProvider.java:116)
+        at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.<init>(ClassPathBeanDefinitionScanner.java:136)
+        at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.<init>(ClassPathBeanDefinitionScanner.java:111)
+        at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.<init>(ClassPathBeanDefinitionScanner.java:83)
+        at org.springframework.context.annotation.AnnotationConfigApplicationContext.<init>(AnnotationConfigApplicationContext.java:62)
+        at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+        at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:39)
+        at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:27)
+        at java.lang.reflect.Constructor.newInstance(Constructor.java:513)
+        at java.lang.Class.newInstance0(Class.java:359)
+        at java.lang.Class.newInstance(Class.java:312)
+        at org.springframework.beans.BeanUtils.instantiate(BeanUtils.java:78)
+        at org.springframework.boot.SpringApplication.createApplicationContext(SpringApplication.java:597)
+        at org.springframework.boot.SpringApplication.createAndRefreshContext(SpringApplication.java:340)
+        at org.springframework.boot.SpringApplication.run(SpringApplication.java:307)
+        at org.springframework.boot.SpringApplication.run(SpringApplication.java:1191)
+        at org.springframework.boot.SpringApplication.run(SpringApplication.java:1180)
+        at com.hall.test.SampleWebJspApplication.main(SampleWebJspApplication.java:25)
+        ... 6 more
+        
+        原因：
+        用jdk1.7编译的程序，在jdk1.6及以下版本执行引起以上错误。
+        major.minor version 51.0为Java编译器内部的版本号
+        对应如下：
+        Unsupported major.minor version 52.0 对应于 JDK1.8（JRE1.8） 
+        Unsupported major.minor version 51.0 对应于 JDK1.7（JRE1.7） 
+        Unsupported major.minor version 50.0 对应于 JDK1.6（JRE1.6） 
+        Unsupported major.minor version 49.0 对应于 JDK1.5（JRE1.5） 
+        Unsupported major.minor version 48.0 对应于 JDK1.4（JRE1.4）
+        解决办法重新下载jdk1.6重新编译程序。
+        同时不要相信gradle配置文件中的
+        sourceCompatibility = 1.6
+        targetCompatibility = 1.6
+        此处解决不了程序编译时java编译器版本问题，系统编译时还是会使用你机器上安装的默认版本进行编译。
+        请在命令窗口执行java －version查看java版本。
+        
+        mac系统安装jdk1.6:
+        jdk1.6 for mac 官网下载地址
+        http://support.apple.com/kb/DL1572
+        安装后的默认路径为/Library/Java/JavaVirtualMachines
+        在mac终端自由切换jdk版本
+        在用户目录下 vi ~/.bash_profile,配置JAVA_HOME的路径：
+        增加以下内容：
+        export JAVA_6_HOME=/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home
+        export JAVA_8_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_65.jdk/Contents/Home
+        export JAVA_HOME=$JAVA_8_HOME
+
+        alias jdk8='export JAVA_HOME=$JAVA_8_HOME'
+        alias jdk6='export JAVA_HOME=$JAVA_6_HOME'
+        请根据jdk的安装路径调整第一行第二行内容。
+        在终端中执行source ~/.bash_profile，使bash重新载入配置信息。
+        然后在终端中执行jdk6或jdk8进行jdk版本切换。只在当前窗口有效，终端窗口关闭又恢复默认值。
+        因为使用jdk1.6版本，同时要调整boot里集成的tomcat版本为7.修改gradle配置文件如下：
+        ext['tomcat.version'] = '7.0.59'
+        dependencies {
+          compile 'org.springframework.boot:spring-boot-starter-web'
+          compile group:'org.apache.tomcat', name:'tomcat-juli', version:property('tomcat.version')
+        }
+        参考文档：
+        http://wenku.baidu.com/link?url=70kc8XzIJCdFdjnIYCf4kdI8romC7tG1Sxff5rz2oKIZk4urMwHNf_573OmeM8lojIavWkZLyEt5ZC0CGvl3tdc_faq-m27JLHX90sZ_t3u
+        http://www.codecate.com/code/archives/16
+        https://support.apple.com/kb/DL1572?locale=zh_CN
+        http://blog.csdn.net/ithomer/article/details/33339071
+        http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#_use_tomcat_7_x_or_8_0_with_gradle
+        
