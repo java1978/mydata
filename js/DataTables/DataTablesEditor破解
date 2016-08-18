@@ -12,3 +12,19 @@
  此方式只在1.5.6测试过，其它版本不保证可用。
  new P5g('2016-08-23')这种加时间戳的方式，发现有人说在火狐浏览器是不支持的，由于没安装火狐浏览器，没测试过，如果需要支持火狐浏览
  器需要测试一下。
+ 在ie8下js的new Date("2016-06-01")函数是无效的，这样返回不了时间，需要通过一下js函数返回时间：
+ function parseISO8601(dateStringInRange) {
+    var isoExp = /^\s*(\d{4})-(\d\d)-(\d\d)\s*$/,
+        date = new Date(NaN), month,
+        parts = isoExp.exec(dateStringInRange);
+    if(parts) {
+      month = +parts[2];
+      date.setFullYear(parts[1], month - 1, parts[3]);
+      if(month != date.getMonth() + 1) {
+        date.setTime(NaN);
+      }
+    }
+    return date;
+  }
+  在dataTables.editor.min.js中增加以上函数，然后将new P5g('2016-08-23')修改为parseISO8601('2016-08-23')即可以。
+  参考文档：http://ju.outofmemory.cn/entry/95546
