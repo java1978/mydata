@@ -1,0 +1,3 @@
+运行spring boot程序
+系统报vxfs: msgcnt 1356362 mesg 001: V-2-1: vx_nospace - /dev/vg00/lvol8 file system full
+通过 df -k 命令查看系统空间情况。对已满的空间进行清除，系统可运行。
