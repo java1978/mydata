@@ -1,0 +1,6 @@
+1、CentOS7安装jdk，下载jdk-8u101-linux-x64.rpm安装文件
+执行以下命令进行安装
+rpm -ivh jdk-8u101-linux-x64.rpm
+如需修改环境变量信息
+vi /etc/profile
+一般默认第一次安装不需要修改环境变量。
