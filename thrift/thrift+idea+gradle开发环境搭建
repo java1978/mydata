@@ -1,3 +1,50 @@
 1、先用idea创建gradle工程。
 2、打开build.gradle文件，引入thrift-gradle-plugin插件
-github项目工程地址：https://github.com/jruyi/thrift-gradle-plugin
+thrift-gradle-plugin插件github项目工程地址：https://github.com/jruyi/thrift-gradle-plugin
+build.gradle文件内容
+group 'thrift'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "gradle.plugin.org.jruyi.gradle:thrift-gradle-plugin:0.3.1"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: "org.jruyi.thrift"
+apply plugin: 'idea'
+//apply plugin: 'spring-boot'
+apply plugin: 'war'//引入war插件
+
+sourceCompatibility = 1.6
+war {//打包war文件信息
+    baseName = 'thrift-learn'
+    version =  '0.1.0'
+}
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.apache.thrift', name: 'libthrift', version: '0.9.3'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+compileThrift {
+    recurse true
+    createGenFolder =false
+    thriftExecutable = '/usr/local/Cellar/thrift/0.9.3/bin/thrift'//此处为你安装的thrift可执行文件地址，及时你本机配置了环境变量此处也要写绝对路径
+    generator 'java', 'private-members'
+    outputDir = file('src/main/java')//指定编译.thrift文件生成的java接口文件地址
+}
+同时要在项目中引入编译生成的libthrift-0.*.*.jar包，当前最新包为libthrift-0.9.3.jar，引入以后生成接口就不会找不到引用的java类了。
+3、配置完成后就可以在idea中执行thrift-gradle-plugin插件的build操作完成对.thrift文件的编译。
+或者在项目中执行gradlew build进行编译，等同于在终端窗口的thrift -r --gen java ＊.thrift命令操作。
+4、完成以上操作后，就是可以在你的idea工程里进行你的服务端、客户端代码编写了。
+
