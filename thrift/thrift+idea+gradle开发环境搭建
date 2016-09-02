@@ -1,0 +1,3 @@
+1、先用idea创建gradle工程。
+2、打开build.gradle文件，引入thrift-gradle-plugin插件
+github项目工程地址：https://github.com/jruyi/thrift-gradle-plugin
