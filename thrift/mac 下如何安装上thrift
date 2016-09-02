@@ -1,0 +1,11 @@
+试了n多上网写的安装步骤，最终参照安装成功的一个帖子。
+http://my.oschina.net/jywm/blog/709207
+简介步骤如下：
+1、确保自己用brew 可以下载软件，如果没有则在命令中输入
+curl -LsSf http://github.com/mxcl/homebrew/tarball/master | sudo tar xvz -C/usr/local --strip 1
+2、下载安装thrift
+brew install thrift
+3、安装完后，确认thrift是否安装完成
+wangbldeMacBook-Pro:~ wangbl$ thrift -version
+Thrift version 0.9.3
+wangbldeMacBook-Pro:~ wangbl$ 
