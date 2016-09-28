@@ -1,0 +1,75 @@
+代理模式（英语：Proxy Pattern）是程序设计中的一种设计模式。
+
+所谓的代理者是指一个类别可以作为其它东西的接口。代理者可以作任何东西的接口：网络连接、内存中的大对象、文件或其它昂贵或无法复制的资源。
+
+以下Java示例解释"虚拟代理"模式。ProxyImage 类别用来访问远程方法。
+
+import java.util.*;
+ 
+interface Image {
+    public void displayImage();
+}
+
+//on System A 
+class RealImage implements Image {
+    private String filename;
+    public RealImage(String filename) { 
+        this.filename = filename;
+        loadImageFromDisk();
+    }
+
+    private void loadImageFromDisk() {
+        System.out.println("Loading   " + filename);
+    }
+
+    public void displayImage() { 
+        System.out.println("Displaying " + filename); 
+    }
+}
+
+//on System B 
+class ProxyImage implements Image {
+    private String filename;
+    private Image image;
+ 
+    public ProxyImage(String filename) { 
+        this.filename = filename; 
+    }
+    public void displayImage() {
+        if(image == null)
+              image = new RealImage(filename);
+        image.displayImage();
+    }
+}
+ 
+class ProxyExample {
+    public static void main(String[] args) {
+        Image image1 = new ProxyImage("HiRes_10MB_Photo1");
+        Image image2 = new ProxyImage("HiRes_10MB_Photo2");     
+        
+        image1.displayImage(); // loading necessary
+        image2.displayImage(); // loading necessary
+    }
+}
+程序的输出为：
+
+Loading    HiRes_10MB_Photo1
+Displaying HiRes_10MB_Photo1
+Loading    HiRes_10MB_Photo2
+Displaying HiRes_10MB_Photo2
+摘自维基百科
+https://zh.wikipedia.org/wiki/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F
+
+1，什么是代理模式？
+代理模式的作用是：为其他对象提供一种代理以控制对这个对象的访问。
+2，代理模式有什么好处？
+在某些情况下，一个客户不想或者不能直接引用另一个对象，而代理对象可以在客户端和目标对象之间起到中介的作用。
+3，代理模式一般涉及到的角色有：
+抽象角色：声明真实对象和代理对象的共同接口,这样一来在任何可以使用目标对象的地方都可以使用代理对象。
+
+代理角色：代理对象内部含有目标对象的引用，从而可以在任何时候操作目标对象；代理对象提供一个与目标对象相同的接口，以便可以在任何时候替代目标对象。代理对象通常在客户端调用传递给目标对象之前或之后，执行某个操作，而不是单纯地将调用传递给目标对象，同时，代理对象可以在执行真实对象操作时，附加其他的操作，相当于对真实对象进行封装。
+
+真实角色：定义了代理对象所代表的目标对象，代理角色所代表的真实对象，是我们最终要引用的对象,定义了代理对象所代表的目标对象。
+
+摘自https://www.zhihu.com/question/20794107
+
