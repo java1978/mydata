@@ -1,0 +1,30 @@
+    本来是在项目中使用DataTables时，发现Editor功能就试用了一下，只用Editor开发了两个简单的功能，因为Editor不支持对输入框的校验，
+所以也就没进一步使用。但是在测试时忽然发现用Editor开发的功能不可用了。赶紧检查问题，才忽然Editor是收费的。本来是想改了那两个
+简单的功能，但觉得能看到源码的东西应该可以破解时间限制的。因此就尝试读了一下源码。花了半天时间终于绕出来了。其实破解很简单。
+针对
+ * File:        dataTables.editor.min.js
+ * Version:     1.5.6
+ 第17行  )('_getTime2'),function(P5g,B5g){return new P5g()[B5g]();}
+ 这里的_getTime2提醒我们这是取时间的，其实校验就是通过这个取到的时间进行判断。其实这行后面的new P5g()应该是new Date(),所以我们
+ 只要在这里加上时间戳就可以，让程序取到的时间永远小于15天（Editor提供15天试用期），比如你下载的dataTables.editor.min.js为
+ 2016-08-08，那你在第17行修改new P5g('2016-08-23'),这个时间只要是你下载的时间＋15天既可以。由于Editor每次下载对应的代码不同的，
+ 所以只要记住修改_getTime2所对应的行既可以。
+ 此方式只在1.5.6测试过，其它版本不保证可用。
+ new P5g('2016-08-23')这种加时间戳的方式，发现有人说在火狐浏览器是不支持的，由于没安装火狐浏览器，没测试过，如果需要支持火狐浏览
+ 器需要测试一下。
+ 在ie8下js的new Date("2016-06-01")函数是无效的，这样返回不了时间，需要通过一下js函数返回时间：
+ function parseISO8601(dateStringInRange) {
+    var isoExp = /^\s*(\d{4})-(\d\d)-(\d\d)\s*$/,
+        date = new Date(NaN), month,
+        parts = isoExp.exec(dateStringInRange);
+    if(parts) {
+      month = +parts[2];
+      date.setFullYear(parts[1], month - 1, parts[3]);
+      if(month != date.getMonth() + 1) {
+        date.setTime(NaN);
+      }
+    }
+    return date;
+  }
+  在dataTables.editor.min.js中增加以上函数，然后将new P5g('2016-08-23')修改为parseISO8601('2016-08-23')即可以。
+  参考文档：http://ju.outofmemory.cn/entry/95546
