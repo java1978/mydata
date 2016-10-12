@@ -1,0 +1,39 @@
+1、Caused by: java.lang.NoSuchMethodError: org.apache.zookeeper.server.quorum.flexible.QuorumMaj.<init>(Ljava/util/Map;)V
+	at org.apache.curator.framework.imps.EnsembleTracker.<init>(EnsembleTracker.java:57) ~[curator-framework-3.2.0.jar:3.2.0]
+	at org.apache.curator.framework.imps.CuratorFrameworkImpl.<init>(CuratorFrameworkImpl.java:158) ~[curator-framework-3.2.0.jar:3.2.0]
+	at org.apache.curator.framework.CuratorFrameworkFactory$Builder.build(CuratorFrameworkFactory.java:156) ~[curator-framework-3.2.0.jar:3.2.0]
+	at com.ljy.zooKeeper.ZooKeeperClient.create(ZooKeeperClient.java:88) ~[main/:na]
+	at com.ljy.zooKeeper.ZooKeeperClient.create(ZooKeeperClient.java:79) ~[main/:na]
+	at com.ljy.zooKeeper.ZooKeeperClient.zooKeeperClientBean(ZooKeeperClient.java:63) ~[main/:na]
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:1.8.0_65]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[na:1.8.0_65]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:1.8.0_65]
+	at java.lang.reflect.Method.invoke(Method.java:497) ~[na:1.8.0_65]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:162) ~[spring-beans-4.3.2.RELEASE.jar:4.3.2.RELEASE]
+	... 47 common frames omitted
+  因为zookeeper版本和对应的curator版本冲突导致
+  https://curator.apache.org
+  Versions
+The are currently two released versions of Curator, 2.x.x and 3.x.x:
+Curator 2.x.x - compatible with both ZooKeeper 3.4.x and ZooKeeper 3.5.x
+Curator 3.x.x - compatible only with ZooKeeper 3.5.x and includes support for new features such as dynamic reconfiguration, etc.
+ZooKeeper 3.5.x adds a number of new features including dynamic reconfiguration, watcher removal and others. The Curator 3.x.x Jira issues tracking these features are here: https://issues.apache.org/jira/browse/CURATOR-159.
+
+2、org.apache.zookeeper.KeeperException$UnimplementedException: KeeperErrorCode = Unimplemented for /ljy/tz/testService/1.0.1/172.0.0.9
+	at org.apache.zookeeper.KeeperException.create(KeeperException.java:103) ~[zookeeper-3.5.2-alpha.jar:3.5.2-alpha-1750793]
+	at org.apache.zookeeper.KeeperException.create(KeeperException.java:51) ~[zookeeper-3.5.2-alpha.jar:3.5.2-alpha-1750793]
+	at org.apache.zookeeper.ZooKeeper.create(ZooKeeper.java:1500) ~[zookeeper-3.5.2-alpha.jar:3.5.2-alpha-1750793]
+	at org.apache.curator.framework.imps.CreateBuilderImpl$17.call(CreateBuilderImpl.java:1056) ~[curator-framework-3.2.0.jar:3.2.0]
+	at org.apache.curator.framework.imps.CreateBuilderImpl$17.call(CreateBuilderImpl.java:1039) ~[curator-framework-3.2.0.jar:3.2.0]
+	at org.apache.curator.connection.StandardConnectionHandlingPolicy.callWithRetry(StandardConnectionHandlingPolicy.java:67) ~[curator-client-3.2.0.jar:na]
+	at org.apache.curator.RetryLoop.callWithRetry(RetryLoop.java:99) ~[curator-client-3.2.0.jar:na]
+	at org.apache.curator.framework.imps.CreateBuilderImpl.pathInForeground(CreateBuilderImpl.java:1035) ~[curator-framework-3.2.0.jar:3.2.0]
+	at org.apache.curator.framework.imps.CreateBuilderImpl.protectedPathInForeground(CreateBuilderImpl.java:509) ~[curator-framework-3.2.0.jar:3.2.0]
+	at org.apache.curator.framework.imps.CreateBuilderImpl.forPath(CreateBuilderImpl.java:499) ~[curator-framework-3.2.0.jar:3.2.0]
+	at org.apache.curator.framework.imps.CreateBuilderImpl.forPath(CreateBuilderImpl.java:477) ~[curator-framework-3.2.0.jar:3.2.0]
+	at org.apache.curator.framework.imps.CreateBuilderImpl.forPath(CreateBuilderImpl.java:44) ~[curator-framework-3.2.0.jar:3.2.0]
+同样是因为版本冲突导致,引入以下两个版本会导致以上错误
+    compile group: 'org.apache.zookeeper', name: 'zookeeper', version: '3.5.2-alpha'
+    compile group: 'org.apache.curator', name: 'curator-framework', version: '3.2.0'
+3、org.apache.zookeeper.KeeperException$UnimplementedException: KeeperErrorCode = Unimplemented for /ljy
+同样是因为版本冲突导致
